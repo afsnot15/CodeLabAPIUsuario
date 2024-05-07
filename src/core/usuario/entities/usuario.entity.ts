@@ -37,7 +37,7 @@ export class Usuario {
   )
   permissao: UsuarioPermissao[];
 
-  constructor(CreateUsuarioDto: CreateUsuarioDto | UpdateUsuarioDto) {
-    Object.assign(this, CreateUsuarioDto);
+  constructor(createUsuarioDto: CreateUsuarioDto | UpdateUsuarioDto) {
+    Object.assign(this, createUsuarioDto);
   }
 }
