@@ -15,7 +15,7 @@ export class HttpResponse<T> implements IResponse<T> {
     return this;
   }
 
-  onUpdated(): IResponse<T> {
+  onUpdate(): IResponse<T> {
     this.message = EMensagem.AtualizadoComSucesso;
     return this;
   }

@@ -6,7 +6,7 @@ import {
   HttpStatus,
 } from '@nestjs/common';
 import { Response } from 'express';
-import { IresponseException } from './../interfaces/response-exception.interface';
+import { IResponseException } from '../interfaces/response-exception.interface';
 
 @Catch()
 export class ResponseExceptionsFilter<T> implements ExceptionFilter {
@@ -19,15 +19,17 @@ export class ResponseExceptionsFilter<T> implements ExceptionFilter {
         ? exception.getStatus()
         : HttpStatus.INTERNAL_SERVER_ERROR;
 
-    response.status(status).json({
-      message: this.transformResponse(exception as IresponseException),
+    return response.status(status).json({
+      message: this.transformResponse(
+        exception as unknown as IResponseException,
+      ),
       data: null,
     });
   }
 
-  private transformResponse(exception: IresponseException): string {
-    if (exception.response?.messsage) {
-      return exception.response.messsage;
+  transformResponse(exception: IResponseException): string {
+    if (exception.response?.message) {
+      return exception.response.message;
     }
 
     return exception.message;

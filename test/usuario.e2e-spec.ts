@@ -25,7 +25,6 @@ describe('Usuario (e2e)', () => {
       new ValidationPipe({
         transform: true,
         whitelist: true,
-        forbidNonWhitelisted: true,
       }),
     );
     app.useGlobalInterceptors(new ResponseTransformInterceptor());
@@ -43,6 +42,8 @@ describe('Usuario (e2e)', () => {
   });
 
   describe('CRUD /usuario', () => {
+    let id: number;
+
     const firstName = faker.person.firstName();
     const lastName = faker.person.lastName();
     const usuario = {
@@ -61,6 +62,8 @@ describe('Usuario (e2e)', () => {
       expect(response).toBeDefined();
       expect(response.body.message).toBe(EMensagem.SalvoComSucesso);
       expect(response.body.data).toHaveProperty('id');
+
+      id = response.body.data.id;
     });
 
     it('Criar um novo usuario usando mesmo email', async () => {
@@ -72,6 +75,128 @@ describe('Usuario (e2e)', () => {
       expect(response.status).toBe(HttpStatus.NOT_ACCEPTABLE);
       expect(response.body.message).toBe(EMensagem.ImpossivelCadastrar);
       expect(response.body.data).toBeNull();
+    });
+
+    it('carregar o usuario criado', async () => {
+      const resp = await request(app.getHttpServer()).get(`/usuario/${id}`);
+
+      expect(resp).toBeDefined();
+      expect(resp.body.mensagem).toBe(undefined);
+      expect(resp.body.message).toBe(null);
+      expect(resp.body.data.email).toBe(usuario.email);
+      expect(resp.body.data.ativo).toBe(usuario.ativo);
+      expect(resp.body.data.admin).toBe(usuario.admin);
+      expect(resp.body.data.password).toBe(undefined);
+      expect(resp.body.data).toHaveProperty('permissao');
+    });
+
+    it('alterar um usuario criado', async () => {
+      const usuarioAlterado = Object.assign(usuario, { id: id, admin: true });
+
+      const resp = await request(app.getHttpServer())
+        .patch(`/usuario/${id}`)
+        .send(usuarioAlterado);
+
+      expect(resp).toBeDefined();
+      expect(resp.body.message).toBe(EMensagem.AtualizadoComSucesso);
+      expect(resp.body.data.admin).toBe(true);
+    });
+
+    it('lançar uma exceção ao alterar um usuario criado passando um id diferente', async () => {
+      const usuarioAlterado = Object.assign(usuario, { id: id, admin: true });
+
+      const resp = await request(app.getHttpServer())
+        .patch(`/usuario/999`)
+        .send(usuarioAlterado);
+
+      expect(resp).toBeDefined();
+      expect(resp.status).toBe(HttpStatus.NOT_ACCEPTABLE);
+      expect(resp.body.message).toBe(EMensagem.IDsDivergente);
+      expect(resp.body.data).toBe(null);
+    });
+
+    it('lançar uma exeção ao alterar um usuario utilizando um email já utilizado', async () => {
+      const firstNameTemp = faker.person.firstName();
+      const lastNameTemp = faker.person.lastName();
+
+      const usuarioTemp = {
+        nome: `${firstNameTemp} ${lastNameTemp}`,
+        email: faker.internet
+          .email({ firstName: firstNameTemp, lastName: lastNameTemp })
+          .toLowerCase(),
+        senha: faker.internet.password(),
+        ativo: true,
+        admin: false,
+      };
+
+      await request(app.getHttpServer()).post('/usuario').send(usuarioTemp);
+
+      const usuarioAlterado = Object.assign(usuario, {
+        email: usuarioTemp.email,
+      });
+
+      const resp = await request(app.getHttpServer())
+        .patch(`/usuario/${id}`)
+        .send(usuarioAlterado);
+
+      expect(resp).toBeDefined();
+      expect(resp.status).toBe(HttpStatus.NOT_ACCEPTABLE);
+      expect(resp.body.message).toBe(EMensagem.ImpossivelAlterar);
+      expect(resp.body.data).toBe(null);
+    });
+
+    it('desativar um usuario cadastrado', async () => {
+      const resp = await request(app.getHttpServer()).delete(`/usuario/${id}`);
+
+      expect(resp).toBeDefined();
+      expect(resp.body.message).toBe(EMensagem.DesativadoComSucesso);
+      expect(resp.body.data).toBe(false);
+    });
+
+    it('lançar uma exceção ao desativar um usuario não cadastrado', async () => {
+      const resp = await request(app.getHttpServer()).delete(`/usuario/999`);
+
+      expect(resp).toBeDefined();
+      expect(resp.status).toBe(HttpStatus.NOT_ACCEPTABLE);
+      expect(resp.body.message).toBe(EMensagem.ImpossivelDesativar);
+      expect(resp.body.data).toBe(null);
+    });
+  });
+
+  describe('findAll /usuario', () => {
+    it('obter todos os registros da página 1', async () => {
+      for (let i = 0; i < 10; i++) {
+        const firstNameTemp = faker.person.firstName();
+        const lastNameTemp = faker.person.lastName();
+
+        const usuarioTemp = {
+          nome: `${firstNameTemp} ${lastNameTemp}`,
+          email: faker.internet
+            .email({ firstName: firstNameTemp, lastName: lastNameTemp })
+            .toLowerCase(),
+          senha: faker.internet.password(),
+          ativo: true,
+          admin: false,
+        };
+
+        await request(app.getHttpServer()).post('/usuario').send(usuarioTemp);
+      }
+
+      const resp = await request(app.getHttpServer()).get(`/usuario/1/10`);
+
+      expect(resp).toBeDefined();
+      expect(resp.body.mensagem).toBe(undefined);
+      expect(resp.body.message).toBe(null);
+      expect(resp.body.data.length).toBe(10);
+    });
+
+    it('obter todos os registros da página 2', async () => {
+      const resp = await request(app.getHttpServer()).get(`/usuario/2/10`);
+
+      expect(resp).toBeDefined();
+      expect(resp.body.message).toBe(null);
+      expect(resp.body.mensagem).toBe(undefined);
+      expect(resp.body.data.length).toBe(2);
     });
   });
 });

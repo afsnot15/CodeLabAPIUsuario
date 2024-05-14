@@ -1,4 +1,4 @@
-export interface IresponseException {
-  response: { messsage: string };
+export interface IResponseException {
+  response: { message: string };
   message: string;
 }

@@ -33,8 +33,8 @@ export class UsuarioService {
 
     return await this.repository.find({
       loadEagerRelations: false,
-      skip: size * page || 0,
-      take: size || 10,
+      skip: size * page,
+      take: size,
     });
   }
 
@@ -74,7 +74,7 @@ export class UsuarioService {
     if (!finded) {
       throw new HttpException(
         EMensagem.ImpossivelDesativar,
-        HttpStatus.NOT_FOUND,
+        HttpStatus.NOT_ACCEPTABLE,
       );
     }
 
