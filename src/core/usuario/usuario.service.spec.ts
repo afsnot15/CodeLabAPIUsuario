@@ -2,6 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { EMensagem } from '../../shared/enums/mensagem.enum';
+import { IFindAllOrder } from '../../shared/interfaces/find-all-order.interface';
 import { Usuario } from './entities/usuario.entity';
 import { UsuarioService } from './usuario.service';
 
@@ -93,11 +94,13 @@ describe('UsuarioService', () => {
         },
       ];
 
+      const order: IFindAllOrder = { column: 'id', sort: 'asc' };
+
       const spyRepositoryFind = jest
         .spyOn(repository, 'find')
         .mockReturnValue(Promise.resolve(mockUsuarioLista));
 
-      const response = await service.findAll(1, 10);
+      const response = await service.findAll(1, 10, order);
 
       expect(spyRepositoryFind).toHaveBeenCalled();
 

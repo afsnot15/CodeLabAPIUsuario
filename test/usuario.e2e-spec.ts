@@ -182,7 +182,11 @@ describe('Usuario (e2e)', () => {
         await request(app.getHttpServer()).post('/usuario').send(usuarioTemp);
       }
 
-      const resp = await request(app.getHttpServer()).get(`/usuario/1/10`);
+      const order: string = JSON.stringify({ column: 'id', sort: 'asc' });
+
+      const resp = await request(app.getHttpServer()).get(
+        `/usuario/1/10/${order}`,
+      );
 
       expect(resp).toBeDefined();
       expect(resp.body.mensagem).toBe(undefined);
@@ -191,12 +195,45 @@ describe('Usuario (e2e)', () => {
     });
 
     it('obter todos os registros da página 2', async () => {
-      const resp = await request(app.getHttpServer()).get(`/usuario/2/10`);
+      const order: string = JSON.stringify({ column: 'id', sort: 'asc' });
+
+      const resp = await request(app.getHttpServer()).get(
+        `/usuario/2/10/${order}`,
+      );
 
       expect(resp).toBeDefined();
       expect(resp.body.message).toBe(null);
       expect(resp.body.mensagem).toBe(undefined);
       expect(resp.body.data.length).toBe(2);
+    });
+
+    it('obter usuário com base no filtro especificado', async () => {
+      const order: string = JSON.stringify({ column: 'id', sort: 'asc' });
+
+      const usuarioCadastrado = await request(app.getHttpServer()).get(
+        `/usuario/1/1/${order}`,
+      );
+
+      const nomeFiltro = usuarioCadastrado.body.data[0].nome;
+      const emailFiltro = usuarioCadastrado.body.data[0].email;
+
+      console.log(nomeFiltro, emailFiltro);
+
+      const filter = JSON.stringify([
+        { column: 'nome', value: nomeFiltro },
+        { column: 'email', value: emailFiltro },
+      ]);
+
+      const resp = await request(app.getHttpServer()).get(
+        `/usuario/1/10/${order}?filter=${filter}`,
+      );
+
+      expect(resp).toBeDefined();
+      expect(resp.body.mensagem).toBe(undefined);
+      expect(resp.body.message).toBe(null);
+      expect(resp.body.data.length).toBe(1);
+      expect(resp.body.data[0].nome).toBe(nomeFiltro);
+      expect(resp.body.data[0].email).toBe(emailFiltro);
     });
   });
 });
