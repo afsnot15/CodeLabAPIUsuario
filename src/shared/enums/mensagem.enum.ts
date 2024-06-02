@@ -1,5 +1,6 @@
 export enum EMensagem {
   AtualizadoComSucesso = 'Atualizado com sucesso!',
+  AutenticadoComSucesso = 'Autenticado com sucesso!',
   DesativadoComSucesso = 'Desativado com sucesso!',
   DeveSerInformado = 'Deve ser informado!',
   DeveSerVazio = 'Deve ser vazio',
@@ -13,4 +14,5 @@ export enum EMensagem {
   NaoValido = 'Não é válido',
   OrderInvalido = 'Order inválido!',
   SalvoComSucesso = 'Salvo com sucesso!',
+  UsuarioSenhaInvalido = 'Usuário e/ou senha inválidos!',
 }

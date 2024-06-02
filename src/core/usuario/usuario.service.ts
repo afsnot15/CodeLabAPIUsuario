@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { EMensagem } from '../../shared/enums/mensagem.enum';
 //import { IFindAllFilter } from '../../shared/interfaces/find-all-filter.interface';
+import * as bcrypt from 'bcryptjs';
 import { handleFilter } from '../../shared/helpers/sql.helper';
 import { IFindAllFilter } from '../../shared/interfaces/find-all-filter.interface';
 import { IFindAllOrder } from '../../shared/interfaces/find-all-order.interface';
@@ -27,7 +28,10 @@ export class UsuarioService {
       );
     }
 
-    const created = this.repository.create(createUsuarioDto);
+    const usuario = new Usuario(createUsuarioDto);
+    usuario.senha = bcrypt.hashSync(usuario.senha);
+
+    const created = this.repository.create(usuario);
 
     return await this.repository.save(created);
   }
@@ -77,6 +81,8 @@ export class UsuarioService {
         HttpStatus.NOT_ACCEPTABLE,
       );
     }
+
+    updateUsuarioDto.senha = bcrypt.hashSync(updateUsuarioDto.senha);
 
     return await this.repository.save(updateUsuarioDto);
   }
