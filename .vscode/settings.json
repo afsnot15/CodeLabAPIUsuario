@@ -3,6 +3,5 @@
   "editor.codeActionsOnSave": {
     "source.organizeImports": "explicit"
   },
-  "typescript.preferences.importModuleSpecifier": "relative",
-  "jestrunner.configPath": "jest-e2e.json"
+  "typescript.preferences.importModuleSpecifier": "relative"
 }

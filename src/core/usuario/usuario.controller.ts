@@ -6,6 +6,7 @@ import {
   Param,
   Patch,
   Post,
+  Put,
   Query,
 } from '@nestjs/common';
 import { IFindAllFilter } from '../../shared/interfaces/find-all-filter.interface';
@@ -14,6 +15,7 @@ import { IResponse } from '../../shared/interfaces/response.interface';
 import { ParseFindAllFilterPipe } from '../../shared/pipes/parse-find-all-filter.pipe';
 import { ParseFindAllOrderPipe } from '../../shared/pipes/parse-find-all-order.pipe';
 import { HttpResponse } from './../../shared/classes/http-response';
+import { AlterarSenhaUsuarioDto } from './dto/alterar-senha-usuario.dto';
 import { CreateUsuarioDto } from './dto/create-usuario.dto';
 import { UpdateUsuarioDto } from './dto/update-usuario.dto';
 import { Usuario } from './entities/usuario.entity';
@@ -67,5 +69,14 @@ export class UsuarioController {
     const data = await this.usuarioService.unactivate(id);
 
     return new HttpResponse<boolean>(data).onUnactivated();
+  }
+
+  @Put('alterar-senha')
+  async alterarSenha(
+    @Body() alterarSenhaUsuarioDto: AlterarSenhaUsuarioDto,
+  ): Promise<IResponse<boolean>> {
+    const data = await this.usuarioService.alterarSenha(alterarSenhaUsuarioDto);
+
+    return new HttpResponse<boolean>(data).onUpdate();
   }
 }
