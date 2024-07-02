@@ -1,11 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import {
-    ClientProxy,
-    ClientProxyFactory,
-    Closeable,
+  ClientProxy,
+  ClientProxyFactory,
+  Closeable,
 } from '@nestjs/microservices';
-import { rmqConfig } from './../../config/database/queue/rmq.config';
+import { rmqConfig } from '../../config/queue/rmq.config';
 
 @Injectable()
 export class RmqClientService {

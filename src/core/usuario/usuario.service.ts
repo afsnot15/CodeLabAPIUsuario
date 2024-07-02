@@ -1,9 +1,8 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import * as bcrypt from 'bcryptjs';
 import { Repository } from 'typeorm';
 import { EMensagem } from '../../shared/enums/mensagem.enum';
-//import { IFindAllFilter } from '../../shared/interfaces/find-all-filter.interface';
-import * as bcrypt from 'bcryptjs';
 import { handleFilter } from '../../shared/helpers/sql.helper';
 import { IFindAllFilter } from '../../shared/interfaces/find-all-filter.interface';
 import { IFindAllOrder } from '../../shared/interfaces/find-all-order.interface';
@@ -68,6 +67,19 @@ export class UsuarioService {
     return await this.repository.findOne({ where: { id: id } });
   }
 
+  async findOneGrpc(id: number): Promise<Usuario> {
+    const usuario = await this.repository.findOne({
+      select: ['id', 'nome', 'email'],
+      where: { id: id },
+    });
+
+    if (usuario) {
+      return usuario;
+    }
+
+    return {} as unknown as Usuario;
+  }
+
   async update(
     id: number,
     updateUsuarioDto: UpdateUsuarioDto,
@@ -122,8 +134,6 @@ export class UsuarioService {
   async alterarSenha(
     alterarSenhaUsurioDto: AlterarSenhaUsuarioDto,
   ): Promise<boolean> {
-    console.log('Oooooooookk');
-
     const findedToken = await this.findRecuperacaoSenhaByEmailAndToken(
       alterarSenhaUsurioDto.email,
       alterarSenhaUsurioDto.token,

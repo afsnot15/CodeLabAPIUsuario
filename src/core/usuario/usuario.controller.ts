@@ -9,6 +9,7 @@ import {
   Put,
   Query,
 } from '@nestjs/common';
+import { GrpcMethod } from '@nestjs/microservices';
 import { IFindAllFilter } from '../../shared/interfaces/find-all-filter.interface';
 import { IFindAllOrder } from '../../shared/interfaces/find-all-order.interface';
 import { IResponse } from '../../shared/interfaces/response.interface';
@@ -78,5 +79,10 @@ export class UsuarioController {
     const data = await this.usuarioService.alterarSenha(alterarSenhaUsuarioDto);
 
     return new HttpResponse<boolean>(data).onUpdate();
+  }
+
+  @GrpcMethod('UsuarioService', 'FindOne')
+  async findOneGrpc(data: { id: string }): Promise<Usuario> {
+    return await this.usuarioService.findOneGrpc(+data.id);
   }
 }
