@@ -22,7 +22,7 @@ import { UpdateUsuarioDto } from './dto/update-usuario.dto';
 import { Usuario } from './entities/usuario.entity';
 import { UsuarioService } from './usuario.service';
 
-@Controller('usuario')
+@Controller('')
 export class UsuarioController {
   constructor(private readonly usuarioService: UsuarioService) {}
 
@@ -43,9 +43,14 @@ export class UsuarioController {
     @Query('filter', ParseFindAllFilterPipe)
     filter?: IFindAllFilter | IFindAllFilter[],
   ): Promise<IResponse<Usuario[]>> {
-    const data = await this.usuarioService.findAll(page, size, order, filter);
+    const { data, count } = await this.usuarioService.findAll(
+      page,
+      size,
+      order,
+      filter,
+    );
 
-    return new HttpResponse<Usuario[]>(data);
+    return new HttpResponse<Usuario[]>(data, undefined, count);
   }
 
   @Get(':id')
